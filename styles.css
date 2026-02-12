@@ -40,19 +40,19 @@ button {
   border-radius: 6px;
   display: flex;
   flex-direction: column;
-  min-height: 380px;
+  min-height: 420px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+  transform: translateY(-6px);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.15);
 }
 
 .card h2 {
   margin-top: 0;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .meta {
@@ -60,13 +60,13 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #777;
-  margin-bottom: 15px;
+  margin-bottom: 18px;
 }
 
 .section {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .tags {
@@ -77,7 +77,7 @@ button {
 }
 
 .tag-pill {
-  padding: 4px 8px;
+  padding: 5px 10px;
   font-size: 11px;
   border-radius: 20px;
   color: white;
