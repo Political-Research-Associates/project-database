@@ -13,7 +13,8 @@
   <h1>Project Database</h1>
 
   <div class="controls">
-    <input type="text" id="searchInput" placeholder="Search..." />
+    <input type="text" id="searchInput" placeholder="Search name or affiliation..." />
+    <button id="searchBtn">Search</button>
 
     <select id="typeFilter">
       <option value="">All Types</option>
@@ -28,9 +29,8 @@
   </div>
 </header>
 
-<div id="tagFilters"></div>
 <div id="resultsCount"></div>
-<div id="cardsContainer"></div>
+<div id="cardsContainer" class="grid"></div>
 
 <script src="script.js"></script>
 </body>
