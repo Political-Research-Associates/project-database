@@ -1,0 +1,88 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f7f7f7;
+  margin: 0;
+  padding: 30px;
+  color: #111;
+}
+
+header h1 {
+  margin-bottom: 15px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+input, select {
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#tagFilters {
+  margin-bottom: 15px;
+}
+
+.tag {
+  display: inline-block;
+  background: #eaeaea;
+  padding: 6px 10px;
+  margin: 4px;
+  font-size: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.tag.active {
+  background: #000;
+  color: white;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  margin-bottom: 18px;
+  border-radius: 4px;
+  border-left: 4px solid #000;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.meta {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+  color: #666;
+}
+
+.section {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.expand-btn {
+  margin-top: 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #0066cc;
+}
+
+.hidden {
+  display: none;
+}
+
+.relationship {
+  color: #0066cc;
+  cursor: pointer;
+  text-decoration: underline;
+}

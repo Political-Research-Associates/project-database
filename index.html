@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Project Database</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>Project Database</h1>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="Search..." />
+
+    <select id="typeFilter">
+      <option value="">All Types</option>
+      <option value="Individual">Individuals</option>
+      <option value="Org">Organizations</option>
+    </select>
+
+    <select id="sortSelect">
+      <option value="az">Sort A–Z</option>
+      <option value="za">Sort Z–A</option>
+    </select>
+  </div>
+</header>
+
+<div id="tagFilters"></div>
+<div id="resultsCount"></div>
+<div id="cardsContainer"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
