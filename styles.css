@@ -3,29 +3,37 @@ body {
   background: #f4f4f4;
   margin: 0;
   padding: 30px;
-  color: #111;
-}
-
-header h1 {
-  margin-bottom: 15px;
 }
 
 .controls {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 input, select, button {
   padding: 8px 12px;
   font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
 }
 
-button {
+.tag-filter-bar {
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-filter {
+  padding: 5px 10px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
   cursor: pointer;
+}
+
+.tag-filter.active {
+  outline: 2px solid black;
 }
 
 .grid {
@@ -38,9 +46,9 @@ button {
   background: white;
   padding: 20px;
   border-radius: 6px;
+  min-height: 420px;
   display: flex;
   flex-direction: column;
-  min-height: 420px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
 }
@@ -48,19 +56,6 @@ button {
 .card:hover {
   transform: translateY(-6px);
   box-shadow: 0 14px 28px rgba(0,0,0,0.15);
-}
-
-.card h2 {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
-.meta {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #777;
-  margin-bottom: 18px;
 }
 
 .section {
@@ -78,8 +73,46 @@ button {
 
 .tag-pill {
   padding: 5px 10px;
-  font-size: 11px;
   border-radius: 20px;
   color: white;
-  font-weight: 500;
+  font-size: 11px;
+}
+
+.pagination {
+  margin-top: 30px;
+  display: flex;
+  gap: 10px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  max-width: 800px;
+  width: 90%;
+  padding: 30px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
 }
