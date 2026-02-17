@@ -1,69 +1,55 @@
-let rawData = [];
+let allData = [];
 let filteredData = [];
-let tagColorMap = {};
 let activeTags = new Set();
 let currentPage = 1;
-const pageSize = 9;
+const cardsPerPage = 6;
 
-const searchInput = document.getElementById("searchInput");
-const searchBtn = document.getElementById("searchBtn");
-const typeFilter = document.getElementById("typeFilter");
-const tagFilters = document.getElementById("tagFilters");
-const pagination = document.getElementById("pagination");
+const tagColors = {};
+const colorPalette = [
+  "#1f77b4","#ff7f0e","#2ca02c","#d62728",
+  "#9467bd","#8c564b","#e377c2","#7f7f7f",
+  "#bcbd22","#17becf"
+];
 
-Papa.parse("data.csv", {
-  download: true,
-  header: true,
-  skipEmptyLines: true,
-  complete: function(results) {
-    rawData = results.data;
-    generateTagColors();
-    buildTagFilters();
-    applyFilters();
+function safe(value) {
+  return value ? value.toString() : "";
+}
+
+function normalize(value) {
+  return safe(value).toLowerCase();
+}
+
+function getTagColor(tag) {
+  if (!tagColors[tag]) {
+    const index = Object.keys(tagColors).length % colorPalette.length;
+    tagColors[tag] = colorPalette[index];
   }
-});
-
-function normalize(str) {
-  return str ? String(str).toLowerCase() : "";
+  return tagColors[tag];
 }
 
-function createEl(tag, text, className) {
-  const el = document.createElement(tag);
-  if (text) el.textContent = text;
-  if (className) el.className = className;
-  return el;
-}
-
-/* ---------- Tag Colors ---------- */
-
-function generateTagColors() {
+function extractTags(data) {
   const tags = new Set();
-  rawData.forEach(row => {
-    if (row["Tags"]) {
-      row["Tags"].split(",").forEach(t => tags.add(t.trim()));
+  data.forEach(row => {
+    if (row.Tags) {
+      row.Tags.split(",").forEach(tag => {
+        const clean = tag.trim();
+        if (clean) tags.add(clean);
+      });
     }
   });
-
-  const palette = [
-    "#1f77b4","#ff7f0e","#2ca02c","#d62728",
-    "#9467bd","#8c564b","#e377c2","#7f7f7f",
-    "#bcbd22","#17becf"
-  ];
-
-  let i = 0;
-  tags.forEach(tag => {
-    tagColorMap[tag] = palette[i % palette.length];
-    i++;
-  });
+  return Array.from(tags).sort();
 }
 
-/* ---------- Tag Filter Bar ---------- */
+function renderTagFilters(tags) {
+  const container = document.getElementById("tagFilters");
+  container.innerHTML = "";
 
-function buildTagFilters() {
-  tagFilters.innerHTML = "";
-  Object.keys(tagColorMap).forEach(tag => {
-    const pill = createEl("span", tag, "tag-filter");
-    pill.style.backgroundColor = tagColorMap[tag];
+  tags.forEach(tag => {
+    const pill = document.createElement("span");
+    pill.className = "tag";
+    pill.textContent = tag;
+    pill.style.backgroundColor = getTagColor(tag);
+    pill.setAttribute("role", "button");
     pill.setAttribute("tabindex", "0");
 
     pill.addEventListener("click", () => toggleTag(tag, pill));
@@ -71,129 +57,81 @@ function buildTagFilters() {
       if (e.key === "Enter") toggleTag(tag, pill);
     });
 
-    tagFilters.appendChild(pill);
+    container.appendChild(pill);
   });
 }
 
-function toggleTag(tag, el) {
+function toggleTag(tag, element) {
   if (activeTags.has(tag)) {
     activeTags.delete(tag);
-    el.classList.remove("active");
+    element.classList.remove("active");
   } else {
     activeTags.add(tag);
-    el.classList.add("active");
+    element.classList.add("active");
   }
+  currentPage = 1;
   applyFilters();
 }
 
-/* ---------- Search ---------- */
-
-searchBtn.addEventListener("click", applyFilters);
-searchInput.addEventListener("keydown", e => {
-  if (e.key === "Enter") applyFilters();
-});
-typeFilter.addEventListener("change", applyFilters);
-
-/* ---------- Filtering ---------- */
-
 function applyFilters() {
+  const searchTerm = normalize(
+    document.getElementById("searchInput").value
+  );
 
-  const term = normalize(searchInput.value.trim());
-  const type = typeFilter.value;
+  filteredData = allData.filter(row => {
+    const combinedText = Object.values(row)
+      .map(val => normalize(val))
+      .join(" ");
 
-  filteredData = rawData.filter(row => {
-
-    const matchesSearch =
-      !term ||
-      normalize(row["Who"]).includes(term) ||
-      normalize(row["Main affiliation as it relates to Project Esther (e.g. Heritage/NTFCA, White House, evangelical/Christian Zionist movement, etc)"])
-        .includes(term);
-
-    const matchesType =
-      !type || row["Individual/Org"] === type;
+    const matchesSearch = combinedText.includes(searchTerm);
 
     const matchesTags =
       activeTags.size === 0 ||
-      (row["Tags"] &&
-        [...activeTags].every(tag =>
-          row["Tags"].includes(tag)
+      (row.Tags &&
+        row.Tags.split(",").some(tag =>
+          activeTags.has(tag.trim())
         ));
 
-    return matchesSearch && matchesType && matchesTags;
+    return matchesSearch && matchesTags;
   });
 
-  currentPage = 1;
-  renderPage();
-}
-
-/* ---------- Pagination ---------- */
-
-function renderPage() {
-  const start = (currentPage - 1) * pageSize;
-  const pageData = filteredData.slice(start, start + pageSize);
-  renderCards(pageData);
+  renderCards();
   renderPagination();
 }
 
-function renderPagination() {
-  pagination.innerHTML = "";
-  const totalPages = Math.ceil(filteredData.length / pageSize);
-
-  for (let i = 1; i <= totalPages; i++) {
-    const btn = createEl("button", i);
-    if (i === currentPage) btn.disabled = true;
-
-    btn.addEventListener("click", () => {
-      currentPage = i;
-      renderPage();
-    });
-
-    pagination.appendChild(btn);
-  }
-}
-
-/* ---------- Cards ---------- */
-
-function renderCards(data) {
-  const container = document.getElementById("cardsContainer");
-  const count = document.getElementById("resultsCount");
-
+function renderCards() {
+  const container = document.getElementById("cardContainer");
   container.innerHTML = "";
-  count.textContent = `${filteredData.length} results`;
 
-  data.forEach(row => {
+  if (filteredData.length === 0) {
+    container.innerHTML = "<p>No results found.</p>";
+    return;
+  }
 
-    const card = createEl("div", null, "card");
-    card.setAttribute("role", "listitem");
+  const start = (currentPage - 1) * cardsPerPage;
+  const pageItems = filteredData.slice(start, start + cardsPerPage);
+
+  pageItems.forEach(row => {
+    const card = document.createElement("div");
+    card.className = "card";
     card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
 
-    const title = createEl("h2", row["Who"]);
-    card.appendChild(title);
+    const title = safe(row.Who);
 
-    const sections = [
-      row["Main affiliation as it relates to Project Esther (e.g. Heritage/NTFCA, White House, evangelical/Christian Zionist movement, etc)"],
-      row["Role in/ties to Project Esther/NTFCA"],
-      row["Key bio points (other and prior organizational and government affiliations)"]
-    ];
+    const tagsHTML = safe(row.Tags)
+      .split(",")
+      .map(tag => tag.trim())
+      .filter(Boolean)
+      .map(tag =>
+        `<span class="tag" style="background:${getTagColor(tag)}">${tag}</span>`
+      )
+      .join("");
 
-    sections.forEach(text => {
-      if (text) card.appendChild(createEl("div", text, "section"));
-    });
-
-    if (row["Tags"]) {
-      const tagContainer = createEl("div", null, "tags");
-      row["Tags"].split(",").forEach(tag => {
-        const trimmed = tag.trim();
-        const pill = createEl("span", trimmed, "tag-pill");
-        pill.style.backgroundColor = tagColorMap[trimmed];
-        pill.addEventListener("click", e => {
-          e.stopPropagation();
-          toggleTag(trimmed, document.querySelector(`.tag-filter[style*="${tagColorMap[trimmed]}"]`));
-        });
-        tagContainer.appendChild(pill);
-      });
-      card.appendChild(tagContainer);
-    }
+    card.innerHTML = `
+      <h3>${title}</h3>
+      <div class="card-tags">${tagsHTML}</div>
+    `;
 
     card.addEventListener("click", () => openModal(row));
     card.addEventListener("keydown", e => {
@@ -204,34 +142,68 @@ function renderCards(data) {
   });
 }
 
-/* ---------- Modal ---------- */
+function renderPagination() {
+  const container = document.getElementById("pagination");
+  container.innerHTML = "";
 
-const modalOverlay = document.getElementById("modalOverlay");
-const modalContent = document.getElementById("modalContent");
-const modalClose = document.getElementById("modalClose");
+  const totalPages = Math.ceil(filteredData.length / cardsPerPage);
+  if (totalPages <= 1) return;
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = i;
+    btn.disabled = i === currentPage;
+
+    btn.addEventListener("click", () => {
+      currentPage = i;
+      renderCards();
+      renderPagination();
+    });
+
+    container.appendChild(btn);
+  }
+}
 
 function openModal(row) {
-  modalContent.innerHTML = "";
-  Object.values(row).forEach(value => {
-    if (value) {
-      modalContent.appendChild(createEl("div", value, "section"));
-    }
-  });
+  const modal = document.getElementById("modal");
+  const body = document.getElementById("modalBody");
 
-  modalOverlay.classList.remove("hidden");
-  modalOverlay.setAttribute("aria-hidden", "false");
-  modalClose.focus();
+  const content = Object.entries(row)
+    .map(([key, value]) => {
+      if (!value) return "";
+      return `<p><strong>${key}:</strong> ${safe(value)}</p>`;
+    })
+    .join("");
+
+  body.innerHTML = content;
+
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+  document.querySelector(".modal-content").focus();
 }
 
 function closeModal() {
-  modalOverlay.classList.add("hidden");
-  modalOverlay.setAttribute("aria-hidden", "true");
+  const modal = document.getElementById("modal");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
 }
 
-modalClose.addEventListener("click", closeModal);
-modalOverlay.addEventListener("click", e => {
-  if (e.target === modalOverlay) closeModal();
-});
+document.getElementById("modalClose")
+  .addEventListener("click", closeModal);
+
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closeModal();
 });
+
+document.getElementById("searchInput")
+  .addEventListener("input", () => {
+    currentPage = 1;
+    applyFilters();
+  });
+
+Papa.parse("data.csv", {
+  download: true,
+  header: true,
+  skipEmptyLines: true,
+  complete: function(results) {
+    allData = results.data.
