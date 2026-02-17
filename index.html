@@ -1,24 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project Database</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<title>Project Database</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
 
-  <header>
-    <h1>Project Database</h1>
-  </header>
+<header>
+  <h1>Project Database</h1>
 
-  <main>
+  <div class="controls">
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Search name or affiliation..." 
+      aria-label="Search by name or affiliation"
+    />
+    <button id="searchBtn">Search</button>
 
-    <section class="controls">
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Search..."
-        aria-label="Search database"
-      />
-      <div id="tagFilters" class="tag-filters"></div>
+    <select id="typeFilter" aria-label="Filter by type">
+      <option value="">All Types</option>
+      <option value="Individual">Individual</option>
+      <option value="Org">Org</option>
+    </select>
+  </div>
+</header>
+
+<div id="tagFilters" class="tag-filter-bar" role="group" aria-label="Tag Filters"></div>
+
+<div id="resultsCount" aria-live="polite"></div>
+
+<div id="cardsContainer" class="grid" role="list"></div>
+
+<div id="pagination" class="pagination"></div>
+
+<!-- Modal -->
+<div id="modalOverlay" class="modal-overlay hidden" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button id="modalClose" class="modal-close" aria-label="Close details">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
