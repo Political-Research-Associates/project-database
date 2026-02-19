@@ -2,45 +2,102 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Project Database</title>
+<title>Project Esther Database</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  FONT: Proxima Nova is a commercial font (Mark Simonson Studio).
+  To use it, add your Adobe Fonts kit <link> here, or a self-hosted @font-face.
+  Nunito is loaded below as a free fallback with a very similar geometric feel.
+  If Proxima Nova is available on the user's system or via Adobe Fonts it will be preferred.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
 
 <header>
-  <h1>Project Database</h1>
-
-  <div class="controls">
-    <input 
-      type="text" 
-      id="searchInput" 
-      placeholder="Search name or affiliation..." 
-      aria-label="Search by name or affiliation"
-    />
-    <button id="searchBtn">Search</button>
-
-    <select id="typeFilter" aria-label="Filter by type">
-      <option value="">All Types</option>
-      <option value="Individual">Individual</option>
-      <option value="Org">Org</option>
-    </select>
+  <div class="header-inner">
+    <h1>Project Esther Database</h1>
+    <div class="controls">
+      <div class="search-wrap">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search name or affiliation&hellip;"
+          aria-label="Search by name or affiliation"
+          autocomplete="off"
+          spellcheck="false"
+          maxlength="200"
+        />
+      </div>
+      <div class="filter-wrap">
+        <select id="typeFilter" aria-label="Filter by type">
+          <option value="">All Types</option>
+          <option value="Individual">Individual</option>
+          <option value="Organization">Organization</option>
+        </select>
+        <select id="sortSelect" aria-label="Sort results">
+          <option value="name-asc">Name A &rarr; Z</option>
+          <option value="name-desc">Name Z &rarr; A</option>
+          <option value="type-asc">Type A &rarr; Z</option>
+        </select>
+        <div class="view-toggle" role="group" aria-label="View mode">
+          <button id="btnGrid" class="view-btn active" aria-pressed="true" title="Grid view">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/>
+              <rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/>
+              <rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/>
+              <rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/>
+            </svg>
+          </button>
+          <button id="btnNetwork" class="view-btn" aria-pressed="false" title="Network graph view">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="2" fill="currentColor"/>
+              <circle cx="2" cy="4" r="1.5" fill="currentColor"/>
+              <circle cx="14" cy="4" r="1.5" fill="currentColor"/>
+              <circle cx="2" cy="12" r="1.5" fill="currentColor"/>
+              <circle cx="14" cy="12" r="1.5" fill="currentColor"/>
+              <line x1="8" y1="8" x2="2" y2="4" stroke="currentColor" stroke-width="1"/>
+              <line x1="8" y1="8" x2="14" y2="4" stroke="currentColor" stroke-width="1"/>
+              <line x1="8" y1="8" x2="2" y2="12" stroke="currentColor" stroke-width="1"/>
+              <line x1="8" y1="8" x2="14" y2="12" stroke="currentColor" stroke-width="1"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 
-<div id="tagFilters" class="tag-filter-bar" role="group" aria-label="Tag Filters"></div>
-
-<div id="resultsCount" aria-live="polite"></div>
-
-<div id="cardsContainer" class="grid" role="list"></div>
-
-<div id="pagination" class="pagination"></div>
+<main>
+  <div id="tagFilters" class="tag-filter-bar" role="group" aria-label="Tag filters"></div>
+  <div class="results-bar">
+    <span id="resultsCount" aria-live="polite" aria-atomic="true"></span>
+    <button id="clearFilters" class="clear-btn hidden">Clear all filters</button>
+  </div>
+  <div id="cardsContainer" class="grid" role="list" aria-label="Results"></div>
+  <div id="networkContainer" class="hidden" aria-label="Network graph">
+    <canvas id="networkCanvas" role="img" aria-label="Network graph of relationships"></canvas>
+    <div id="networkTooltip" class="network-tooltip hidden" role="tooltip"></div>
+    <p class="network-hint">Click a node to open details &middot; Drag to pan &middot; Scroll to zoom</p>
+  </div>
+  <div id="pagination" class="pagination" role="navigation" aria-label="Page navigation"></div>
+</main>
 
 <!-- Modal -->
-<div id="modalOverlay" class="modal-overlay hidden" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true">
-    <button id="modalClose" class="modal-close" aria-label="Close details">×</button>
+<div
+  id="modalOverlay"
+  class="modal-overlay hidden"
+  aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modalTitle"
+>
+  <div class="modal">
+    <button id="modalClose" class="modal-close" aria-label="Close details">&#x2715;</button>
     <div id="modalContent"></div>
   </div>
 </div>
